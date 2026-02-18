@@ -1,0 +1,45 @@
+<!-- templates/home.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Главная страница</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .user-info { background-color: #e9ecef; padding: 15px; border-radius: 5px; }
+        .logout-button {
+            background: none;
+            border: none;
+            color: #007bff;
+            cursor: pointer;
+            padding: 0;
+            font: inherit;
+            text-decoration: underline;
+        }
+        .logout-button:hover {
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Добро пожаловать на сайт!</h1>
+
+    <div class="user-info">
+        {% if user.is_authenticated %}
+            <p>Привет, <strong>{{ user.username }}</strong>!</p>
+            <a href="{% url 'profile' %}">Мой профиль</a>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="logout-button">Выйти из системы</button>
+            </form>
+        {% else %}
+            <p>Вы не авторизованы.</p>
+            <p>
+                <a href="{% url 'login' %}">Войти</a> |
+                <a href="{% url 'sign_up' %}">Зарегистрироваться</a>
+            </p>
+        {% endif %}
+    </div>
+
+    <p><a href="{% url 'about' %}">О нас</a></p>
+</body>
+</html>

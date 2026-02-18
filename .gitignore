@@ -1,0 +1,48 @@
+# Виртуальное окружение
+.venv/
+venv/
+env/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Django
+*.log
+db.sqlite3
+*.sqlite3
+/media/
+/static/
+local_settings.py
+
+# Тесты и отчеты
+allure-results/
+allure-report/
+.coverage
+htmlcov/
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Секреты
+.env
+*.env
+secrets.py
+**/settings/local.py
+
+# Прочее
+*.bak
+*.tmp

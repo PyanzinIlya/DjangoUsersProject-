@@ -1,0 +1,21 @@
+<!-- templates/registration/sign_up.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Регистрация</title>
+</head>
+<body>
+    <h2>Регистрация нового пользователя</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {# Выводим все поля формы с автоматической обработкой ошибок #}
+        {{ form.as_p }}
+
+        <button type="submit">Зарегистрироваться</button>
+    </form>
+
+    <p>Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>
+</body>
+</html>

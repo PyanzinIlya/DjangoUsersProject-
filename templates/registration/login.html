@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Вход на сайт</title>
+</head>
+<body>
+    <h2>Вход</h2>
+
+    {# Проверяем, есть ли ошибки в форме #}
+    {% if form.errors %}
+        <p style="color: red;">Имя пользователя и пароль не совпадают. Попробуйте снова.</p>
+    {% endif %}
+
+    {# Для незалогиненных пользователей показываем форму, для залогиненных - сообщение #}
+    {% if user.is_authenticated %}
+        <p>Вы уже выполнили вход. <a href="{% url 'logout' %}">Выйти?</a></p>
+    {% else %}
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <table>
+                <tr>
+                    <td>{{ form.username.label_tag }}</td>
+                    <td>{{ form.username }}</td>
+                </tr>
+                <tr>
+                    <td>{{ form.password.label_tag }}</td>
+                    <td>{{ form.password }}</td>
+                </tr>
+            </table>
+            <input type="submit" value="Войти">
+            {# Поле next нужно для перенаправления пользователя после входа на ту страницу, откуда он пришел #}
+            <input type="hidden" name="next" value="{{ next }}">
+        </form>
+    {% endif %}
+</body>
+</html>

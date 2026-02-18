@@ -1,0 +1,156 @@
+<!-- templates/profile.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Профиль пользователя</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .profile-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .messages {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+        .messages li {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .messages .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .messages .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .user-info {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .nav-links {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+        }
+        .nav-links a {
+            color: #007bff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <h1>Профиль пользователя</h1>
+
+        <!-- Блок для сообщений об успехе/ошибках -->
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <!-- Информация о пользователе -->
+        <div class="user-info">
+            <p><strong>Дата регистрации:</strong> {{ user.date_joined|date:"d.m.Y H:i" }}</p>
+            <p><strong>Последний вход:</strong> {{ user.last_login|date:"d.m.Y H:i" }}</p>
+            <p><strong>Статус:</strong>
+                {% if user.is_superuser %}
+                    Администратор
+                {% elif user.is_staff %}
+                    Персонал
+                {% else %}
+                    Обычный пользователь
+                {% endif %}
+            </p>
+        </div>
+
+        <h2>Редактировать профиль</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Выводим все поля формы -->
+            {% for field in form %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.errors %}
+                        <ul style="color: red;">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    {% if field.help_text %}
+                        <small style="color: #666;">{{ field.help_text }}</small>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit">Сохранить изменения</button>
+        </form>
+
+        <!-- Ссылки навигации -->
+        <div class="nav-links">
+            <a href="{% url 'home' %}">На главную</a>
+            <a href="{% url 'about' %}">О нас</a>
+            <a href="{% url 'password_change' %}">Сменить пароль</a>
+        </div>
+    </div>
+</body>
+</html>
