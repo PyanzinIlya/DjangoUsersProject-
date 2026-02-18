@@ -69,3 +69,5 @@ def user_data():
         'first_name': 'Новый',
         'last_name': 'Пользователь'
     }
+
+

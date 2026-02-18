@@ -20,3 +20,4 @@ class AdminFactory(UserFactory):
     """Фабрика для создания администраторов"""
     is_staff = True
     is_superuser = True
+

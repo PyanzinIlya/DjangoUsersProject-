@@ -20,7 +20,6 @@ class TestUsersAPI:
         - В ответе только id и username
     """)
     def test_users_list_success(self, authenticated_client, test_user, another_user):
-        """Тест получения списка пользователей"""
         with allure.step("Подготовка к запросу списка пользователей"):
             url = '/api/users/'
             allure.attach(
@@ -79,7 +78,6 @@ class TestUsersAPI:
         - Статус 401 Unauthorized
     """)
     def test_users_list_unauthorized(self, api_client):
-        """Тест получения списка пользователей без авторизации"""
         with allure.step("Подготовка запроса без авторизации"):
             url = '/api/users/'
             allure.attach(
@@ -113,7 +111,6 @@ class TestUsersAPI:
         - Все поля пользователя присутствуют в ответе
     """)
     def test_user_detail_success(self, authenticated_client, test_user, another_user):
-        """Тест получения детальной информации о пользователе"""
         with allure.step("Подготовка к запросу детальной информации"):
             url = f'/api/users/{another_user.id}/'
             allure.attach(
@@ -172,7 +169,6 @@ class TestUsersAPI:
         - Статус 404 Not Found
     """)
     def test_user_detail_not_found(self, authenticated_client):
-        """Тест получения информации о несуществующем пользователе"""
         with allure.step("Подготовка запроса с несуществующим ID"):
             non_existent_id = 99999
             url = f'/api/users/{non_existent_id}/'
@@ -208,7 +204,6 @@ class TestUsersAPI:
         - В ответе присутствуют все поля пользователя
     """)
     def test_admin_users_list_success(self, api_client, test_admin):
-        """Тест получения админского списка пользователей"""
         with allure.step("Авторизация администратора"):
             login_data = {
                 'username': test_admin.username,
@@ -280,7 +275,6 @@ class TestUsersAPI:
         - Статус 403 Forbidden
     """)
     def test_admin_users_list_forbidden(self, authenticated_client, test_user):
-        """Тест доступа к админскому списку обычным пользователем"""
         with allure.step("Подготовка запроса от обычного пользователя"):
             url = '/api/admin/users/'
             allure.attach(
