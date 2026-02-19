@@ -1,0 +1,84 @@
+# Имя workflow - будет отображаться в GitHub Actions
+name: Django CI/CD Pipeline
+
+# События, при которых запускается pipeline
+on:
+  push:
+    branches: [ main, master, develop ]  # при пуше в эти ветки
+  pull_request:
+    branches: [ main, master ]           # при создании PR в эти ветки
+
+# Что мы будем делать
+jobs:
+  # Название задачи (может быть любым)
+  test:
+    # Где запускаем
+    runs-on: ubuntu-latest
+
+    # Стратегия для разных версий Python
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+
+    # Шаги выполнения
+    steps:
+      # 1. Копируем код из репозитория
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Устанавливаем нужную версию Python
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # 3. Устанавливаем зависимости
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-django allure-pytest flake8
+
+      # 4. Проверяем код линтером
+      - name: Lint with flake8
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --exit-zero --max-complexity=10 --statistics
+
+      # 5. Запускаем тесты
+      - name: Run tests with pytest
+        env:
+          # Переменные окружения для тестов
+          SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          DEBUG: 'False'
+          DATABASE_URL: 'sqlite:///db.sqlite3'  # используем SQLite для тестов
+        run: |
+          pytest --alluredir=allure-results
+
+      # 6. Сохраняем результаты тестов как артефакт
+      - name: Upload Allure results
+        uses: actions/upload-artifact@v3
+        if: always()  # всегда, даже если тесты упали
+        with:
+          name: allure-results-${{ matrix.python-version }}
+          path: allure-results/
+          retention-days: 30  # хранить 30 дней
+
+      # 7. Генерируем Allure отчет
+      - name: Generate Allure Report
+        uses: simple-elf/allure-report-action@v1.7
+        if: always()
+        with:
+          allure_results: allure-results
+          allure_history: allure-history
+          keep_reports: 20  # хранить 20 последних отчетов
+
+      # 8. Публикуем отчет на GitHub Pages
+      - name: Deploy Allure report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'  # только для main ветки
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-history
+          destination_dir: .
