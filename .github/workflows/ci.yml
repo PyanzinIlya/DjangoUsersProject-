@@ -1,110 +1,105 @@
-# Имя workflow - будет отображаться в GitHub Actions
 name: Django CI/CD Pipeline
 
-# События, при которых запускается pipeline
 on:
   push:
-    branches: [ main, master, develop ]  # при пуше в эти ветки
+    branches: [ main, master, develop ]
   pull_request:
-    branches: [ main, master ]           # при создании PR в эти ветки
+    branches: [ main, master ]
 
-# Что мы будем делать
 jobs:
-  # Название задачи (может быть любым)
   test:
-    # Где запускаем
     runs-on: ubuntu-latest
 
-    # Стратегия для разных версий Python
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ['3.9', '3.10', '3.11']
+        python-version: ['3.10', '3.11']
 
-    # Шаги выполнения
     steps:
-      # 1. Копируем код из репозитория
-      - name: Checkout code
+      # 1️⃣ Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Устанавливаем нужную версию Python
-      - name: Set up Python ${{ matrix.python-version }}
+      # 2️⃣ Setup Python + cache pip
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          cache: 'pip'
 
-      # 3. Устанавливаем зависимости
+      # 3️⃣ Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest pytest-django allure-pytest flake8
 
-      # 4. Проверяем код линтером
+      # 4️⃣ Lint
       - name: Lint with flake8
         run: |
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           flake8 . --count --exit-zero --max-complexity=10 --statistics
 
-      # 5. Запускаем тесты
+      # 5️⃣ Run tests
       - name: Run tests with pytest
         env:
-          # Переменные окружения для тестов
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
           DEBUG: 'False'
-          DATABASE_URL: 'sqlite:///db.sqlite3'  # используем SQLite для тестов
+          DATABASE_URL: 'sqlite:///db.sqlite3'
         run: |
           mkdir -p allure-results
           pytest --alluredir=allure-results -v
-          ls -la allure-results/ || echo "No allure results created"
-        continue-on-error: false
 
-      # 6. Проверяем наличие результатов тестов
-      - name: Check allure results
-        run: |
-          if [ -d "allure-results" ] && [ "$(ls -A allure-results)" ]; then
-            echo "✅ Allure results found"
-          else
-            echo "❌ No allure results found"
-            exit 1
-          fi
-
-      # 7. Сохраняем результаты тестов как артефакт
+      # 6️⃣ Upload allure results
       - name: Upload Allure results
         uses: actions/upload-artifact@v4
-        if: always()  # всегда, даже если тесты упали
+        if: always()
         with:
           name: allure-results-${{ matrix.python-version }}
-          path: allure-results/
-          retention-days: 30  # хранить 30 дней
-          if-no-files-found: warn
+          path: allure-results
+          retention-days: 30
 
-      # 8. Генерируем Allure отчет вручную
-      - name: Generate Allure Report manually
-        if: always()
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 1️⃣ Download artifacts from Python 3.11
+      - name: Download Allure results
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results-3.11
+          path: allure-results
+
+      # 2️⃣ Setup Java properly
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
+      # 3️⃣ Install Allure
+      - name: Install Allure
         run: |
-          # Установка Java 11 (доступна везде)
-          sudo apt-get update
-          sudo apt-get install -y openjdk-11-jre-headless
-
-          # Скачивание Allure 2.24.0
           wget -q https://github.com/allure-framework/allure2/releases/download/2.24.0/allure-2.24.0.tgz
           tar -xzf allure-2.24.0.tgz
           sudo mv allure-2.24.0 /opt/allure
           sudo ln -s /opt/allure/bin/allure /usr/local/bin/allure
+          allure --version
 
-          # Генерация отчета
-          mkdir -p allure-history
-          allure generate allure-results -o allure-history --clean
+      # 4️⃣ Generate report
+      - name: Generate Allure report
+        run: |
+          allure generate allure-results -o allure-report --clean
 
-          echo "✅ Allure report generated successfully"
-          ls -la allure-history/
-
-      # 9. Публикуем отчет на GitHub Pages
-      - name: Deploy Allure report to GitHub Pages
+      # 5️⃣ Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
-        if: github.ref == 'refs/heads/main'  # только для main ветки
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: allure-history
-          destination_dir: .
+          publish_dir: allure-report
