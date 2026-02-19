@@ -1,0 +1,3 @@
+old_password: wrongpass (неверный)
+new_password: newpass123
+new_password2: newpass123

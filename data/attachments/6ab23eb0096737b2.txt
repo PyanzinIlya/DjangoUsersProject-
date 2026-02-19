@@ -1,0 +1,1 @@
+[ErrorDetail(string='A user with that username already exists.', code='unique')]

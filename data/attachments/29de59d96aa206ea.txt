@@ -1,0 +1,2 @@
+Было: newuser
+Стало: testuser0

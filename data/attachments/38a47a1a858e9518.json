@@ -1,0 +1,1 @@
+{'email': [ErrorDetail(string='Пользователь с таким email уже существует', code='invalid')]}
