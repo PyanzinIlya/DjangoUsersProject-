@@ -1,39 +1,57 @@
 # DjangoUsersProject
+
 Проект на Django с тестированием и Allure отчетами.
 
+## 🚀 Быстрый старт
 
-# Запуск прокета на джанго
-python manage.py runserver  
+### Предварительные требования
+- Python 3.9+
+- Git
+- (Опционально) Allure Commandline для отчетов
 
-# Запуск всех тестов
-pytest
+### Установка
 
-# Запуск тестов с Allure отчетом
-pytest --alluredir=allure-results
-allure serve allure-results
+1. **Клонируйте репозиторий**
+   ```bash
+   git clone https://github.com/PyanzinIlya/DjangoUsersProject-.git
+   cd DjangoUsersProject-
 
 
-# Полезные команды Git
-# Проверить статус файлов
-git status
+### 2. Создайте виртуальное окружение
 
-# Посмотреть историю коммитов
-git log --oneline
+Windows:
 
-# Создать новую ветку
-git checkout -b feature/new-feature
+bash
+python -m venv venv
+venv\Scripts\activate
 
-# Обновить локальный репозиторий
-git pull origin main
+Mac/Linux:
 
-# Отменить изменения в файле
-git checkout -- filename.py
+bash
+python3 -m venv venv
+source venv/bin/activate
 
-# Добавить изменения
-git add .
+### 3. Установите зависимости
 
-# Сделать коммит
-git commit -m "Описание изменений"
+bash
+pip install -r requirements.txt
 
-# Отправить на GitHub
-git push
+### 4.Настройте переменные окружения
+
+bash
+cp .env.example .env
+Отредактируйте .env файл, добавьте свой SECRET_KEY
+
+### 5. Примените миграции
+
+bash
+python manage.py migrate
+Создайте суперпользователя
+
+bash
+python manage.py createsuperuser
+
+### 6.Запустите сервер
+
+bash
+python manage.py runserver

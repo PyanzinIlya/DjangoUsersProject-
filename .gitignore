@@ -46,3 +46,4 @@ secrets.py
 # Прочее
 *.bak
 *.tmp
+help.txt
