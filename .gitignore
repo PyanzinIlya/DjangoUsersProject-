@@ -47,3 +47,4 @@ secrets.py
 *.bak
 *.tmp
 help.txt
+gunicorn.ctl

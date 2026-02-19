@@ -8,3 +8,4 @@ db.sqlite3
 allure-results
 .pytest_cache
 .env
+gunicorn.ctl
