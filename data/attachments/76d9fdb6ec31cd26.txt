@@ -1,0 +1,1 @@
+Все поля присутствуют: {'email', 'date_joined', 'username', 'last_name', 'first_name', 'id', 'last_login'}
