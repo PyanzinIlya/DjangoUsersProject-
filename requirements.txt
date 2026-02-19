@@ -6,3 +6,6 @@ flake8>=6.0.0
 python-dotenv
 djangorestframework
 factory-boy
+gunicorn
+psycopg2-binary
+dj-database-url
