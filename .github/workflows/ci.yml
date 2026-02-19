@@ -57,12 +57,13 @@ jobs:
 
       # 6. Сохраняем результаты тестов как артефакт
       - name: Upload Allure results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()  # всегда, даже если тесты упали
         with:
           name: allure-results-${{ matrix.python-version }}
           path: allure-results/
           retention-days: 30  # хранить 30 дней
+          if-no-files-found: warn
 
       # 7. Генерируем Allure отчет
       - name: Generate Allure Report
