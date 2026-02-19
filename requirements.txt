@@ -5,3 +5,4 @@ allure-pytest>=2.13.0
 flake8>=6.0.0
 python-dotenv
 djangorestframework
+factory-boy
