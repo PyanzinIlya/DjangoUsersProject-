@@ -45,6 +45,13 @@ jobs:
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           flake8 . --count --exit-zero --max-complexity=10 --statistics
 
+      - name: Install Allure
+        run: |
+          sudo apt-add-repository ppa:qameta/allure -y
+          sudo apt-get update
+          sudo apt-get install allure
+        continue-on-error: true  # Продолжить даже если не установится
+
       # 5. Запускаем тесты
       - name: Run tests with pytest
         env:
@@ -53,6 +60,10 @@ jobs:
           DEBUG: 'False'
           DATABASE_URL: 'sqlite:///db.sqlite3'  # используем SQLite для тестов
         run: |
+          mkdir -p allure-results
+          pytest --alluredir=allure-results -v
+          ls -la allure-results/ || echo "No allure results created"
+        continue-on-error: false
           pytest --alluredir=allure-results
 
       # 6. Сохраняем результаты тестов как артефакт
@@ -64,6 +75,7 @@ jobs:
           path: allure-results/
           retention-days: 30  # хранить 30 дней
           if-no-files-found: warn
+
 
       # 7. Генерируем Allure отчет
       - name: Generate Allure Report
