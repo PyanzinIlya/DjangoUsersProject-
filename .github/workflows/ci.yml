@@ -45,15 +45,7 @@ jobs:
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           flake8 . --count --exit-zero --max-complexity=10 --statistics
 
-      # 5. Устанавливаем Allure (опционально)
-      - name: Install Allure
-        run: |
-          sudo apt-add-repository ppa:qameta/allure -y
-          sudo apt-get update
-          sudo apt-get install allure
-        continue-on-error: true  # Продолжить даже если не установится
-
-      # 6. Запускаем тесты
+      # 5. Запускаем тесты
       - name: Run tests with pytest
         env:
           # Переменные окружения для тестов
@@ -66,7 +58,7 @@ jobs:
           ls -la allure-results/ || echo "No allure results created"
         continue-on-error: false
 
-      # 7. Проверяем наличие результатов тестов
+      # 6. Проверяем наличие результатов тестов
       - name: Check allure results
         run: |
           if [ -d "allure-results" ] && [ "$(ls -A allure-results)" ]; then
@@ -76,7 +68,7 @@ jobs:
             exit 1
           fi
 
-      # 8. Сохраняем результаты тестов как артефакт
+      # 7. Сохраняем результаты тестов как артефакт
       - name: Upload Allure results
         uses: actions/upload-artifact@v4
         if: always()  # всегда, даже если тесты упали
@@ -86,7 +78,7 @@ jobs:
           retention-days: 30  # хранить 30 дней
           if-no-files-found: warn
 
-      # 9. Генерируем Allure отчет вручную
+      # 8. Генерируем Allure отчет вручную
       - name: Generate Allure Report manually
         if: always()
         run: |
@@ -107,7 +99,7 @@ jobs:
           echo "✅ Allure report generated successfully"
           ls -la allure-history/
 
-      # 10. Публикуем отчет на GitHub Pages
+      # 9. Публикуем отчет на GitHub Pages
       - name: Deploy Allure report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         if: github.ref == 'refs/heads/main'  # только для main ветки
