@@ -64,7 +64,6 @@ jobs:
           pytest --alluredir=allure-results -v
           ls -la allure-results/ || echo "No allure results created"
         continue-on-error: false
-          pytest --alluredir=allure-results
 
       # 6. Сохраняем результаты тестов как артефакт
       - name: Upload Allure results
