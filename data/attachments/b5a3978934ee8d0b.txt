@@ -1,2 +1,2 @@
-Было: email=testuser5@example.com, first_name=Daniel
+Было: email=testuser5@example.com, first_name=John
 Стало: email=newemail@example.com, first_name=Обновленное
